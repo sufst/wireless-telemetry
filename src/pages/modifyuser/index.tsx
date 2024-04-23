@@ -54,7 +54,16 @@ export const Modify: React.FC = () => {
   const username = query.get("username");
 
 
-  const [user, setUser] = useState<SetUserAction>()
+  const [user, setUser] = useState<SetUserAction>(
+    {
+      username: '',
+      accessToken: '',
+      creation: 0,
+      privilege: 'Anon',
+      department: 'NON SPECIFIED',
+      meta: {}
+    }
+  )
 
 
   const fetchUser = useCallback(async () => {
