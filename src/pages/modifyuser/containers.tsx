@@ -33,6 +33,7 @@ import {
   PrivilegeSelect,
   RegisterFooter,
   RegisterHeader,
+  SubmissionDialog,
 } from "./components";
 import { RegistrationForm, RegisterPaper } from "./styles";
 import { userPatch } from "modules/api/user";
@@ -45,6 +46,10 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
 
   const { user } = props;
 
+  interface Fields {
+    [key: string]: string;
+  }
+
   const selectUser = (state: RootState) => state.user;
   const currentUser = useSelector(selectUser);
 
@@ -56,6 +61,10 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
   const [department, setDepartment] = useState<UserDepartment>("Electronics");
   const [privilege, setPrivilege] = useState<UserPrivilege>("Basic");
 
+  const [userFields, setUserFields] = useState<Fields>({});
+
+  const [dialogOpened, setDialogOpened] = useState<boolean>(false);
+
   const handleDepartmentChange = useCallback((event: any) => {
     setDepartment(event.target.value);
   }, []);
@@ -63,6 +72,17 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
   const handlePrivilegeChange = useCallback((event: any) => {
     setPrivilege(event.target.value);
   }, []);
+
+  const handleDialogChange = useCallback((event: boolean) => {
+    setDialogOpened(event);
+  }, []);
+
+  const handleUserPatch = useCallback((fields: Fields) => {
+    console.log(fields, token, user)
+    if (token && user) {
+      usersPatch(user.username, token, fields);
+    }
+  }, [user, token]);
 
   useEffect(() => {
     console.log(user)
@@ -82,10 +102,6 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
       const username: string = event.target.username.value;
       const password: string = event.target.password.value;
       const confirmPass: string = event.target.passconfirm.value;
-
-      interface Fields {
-        [key: string]: string;
-      }
 
       const defaultFields : Fields = {
         username: username,
@@ -114,9 +130,7 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
                 patchFields[key] = value;
               }
               break;
-            // Add other cases as needed
             default:
-              patchFields[key] = value;
               break;
           }
         }
@@ -135,24 +149,28 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
         return;
       }
 
-      // console.log(username, password, confirmPass, department, privilege)
-
-      if (password !== confirmPass) {
-        const mismatchPassAlert = createAlert(
-          3000,
-          "error",
-          "alert",
-          "The passwords don't match."
-        );
-        dispatch(showAlert(mismatchPassAlert));
+      if (password !== "") {
+        if (password !== confirmPass) {
+          const mismatchPassAlert = createAlert(
+            3000,
+            "error",
+            "alert",
+            "The passwords don't match."
+          );
+          dispatch(showAlert(mismatchPassAlert));
+        } else {
+          patchFields["password"] = password;
+        }
       }
 
-      console.log(patchFields)
 
-      //todo
-    if (token && user) {
-      usersPatch(user.username, token, patchFields);
-    }
+      // console.log(patchFields)
+
+      if (token && user) {
+        // usersPatch(user.username, token, patchFields);
+        setUserFields(patchFields);
+        setDialogOpened(true);
+      }
     },
     [department, privilege, dispatch]
   );
@@ -183,9 +201,10 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
             handlePrivilegeChange={handlePrivilegeChange}
           />
           <div style={{marginTop: "2rem"}}>
-            <LoginButton text="Register" />
+            <LoginButton text="Submit" />
           </div>
         </RegistrationForm>
+        <SubmissionDialog patchFields={userFields} open={dialogOpened} handleDialogChange={handleDialogChange} handleUserPatch={handleUserPatch} />
       </RegisterPaper>
       <RegisterFooter />
     </Container>

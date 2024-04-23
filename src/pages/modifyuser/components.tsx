@@ -22,6 +22,12 @@ import {
   Typography,
   Link,
   Select,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  Button,
+  DialogActions,
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { UserDepartment, UserPrivilege } from "types/models/user";
@@ -124,3 +130,47 @@ export const RegisterFooter = () => {
     </Box>
   );
 };
+
+interface Fields {
+  [key: string]: string;
+}
+
+export const SubmissionDialog = (props: {
+  patchFields: Fields,
+  open: boolean,
+  handleDialogChange: (event: boolean) => void,
+  handleUserPatch: (fields: Fields) => void;
+}) => {
+
+  
+    const { patchFields, open, handleDialogChange, handleUserPatch } = props;
+
+  
+    return(
+      <Dialog
+        open={open}
+        onClose={() => handleDialogChange(false)}
+      >
+        <DialogTitle>
+          Submission
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are u sure u want to submit the following changes?
+          </DialogContentText>
+            {Object.entries(patchFields).map(([key, value]) => (
+              <DialogContentText key={key}>
+                {key}: {value}
+              </DialogContentText>
+            ))}
+            <DialogActions>
+            <Button onClick={() => {
+              handleUserPatch(patchFields);
+              handleDialogChange(false);
+            }}>Submit</Button>
+            </DialogActions>
+
+        </DialogContent>
+      </Dialog>
+    )
+}
