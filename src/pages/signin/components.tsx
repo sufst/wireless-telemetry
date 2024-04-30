@@ -96,7 +96,7 @@ UsernameField.defaultProps = defaultUsernameProps;
 //#endregion
 
 
-export const PasswordField: React.FC<{ label: string; id: string }> = (
+export const PasswordField: React.FC<{error:boolean; label: string; id: string }> = (
   props
 ) => {
   return (
@@ -109,6 +109,7 @@ export const PasswordField: React.FC<{ label: string; id: string }> = (
       type="password"
       id={props.id}
       autoComplete="current-password"
+      error={props.error}
     />
   );
 };

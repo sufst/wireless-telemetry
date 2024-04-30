@@ -44,6 +44,8 @@ export const RegisterContainer: React.FC<{ registerUser: UserRegister }> = (
 
   const dispatch = useDispatch();
 
+  const [error, setError] = useState<boolean>(false);
+
   const [department, setDepartment] = useState<UserDepartment>("Electronics");
 
   const [privilege, setPrivilege] = useState<UserPrivilege>("Basic");
@@ -72,10 +74,12 @@ export const RegisterContainer: React.FC<{ registerUser: UserRegister }> = (
           "Please fill all fields."
         );
         dispatch(showAlert(emptyFieldAlert));
+        setError(true);
         return;
       }
 
       if (password === confirmPass) {
+        setError(false);
         registerUser(username, password, privilege, department);
         return;
       }
@@ -98,8 +102,8 @@ export const RegisterContainer: React.FC<{ registerUser: UserRegister }> = (
         <RegisterHeader />
         <RegistrationForm noValidate onSubmit={onRegisterSubmit}>
           <UsernameField />
-          <PasswordField label="Password" id={"password"} />
-          <PasswordField label="Confirm Password" id={"passconfirm"} />
+          <PasswordField error={error} label="Password" id={"password"} />
+          <PasswordField error={error} label="Confirm Password" id={"passconfirm"} />
           <DepartmentSelect
             department={department}
             handleDepartmentChange={handleDepartmentChange}

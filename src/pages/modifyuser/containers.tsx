@@ -57,6 +57,8 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
 
   const dispatch = useDispatch();
 
+  const [error, setError] = useState<boolean>(false);
+
   const [username, setUsername] = useState<string>("");
   const [department, setDepartment] = useState<UserDepartment>("Electronics");
   const [privilege, setPrivilege] = useState<UserPrivilege>("Basic");
@@ -158,7 +160,10 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
             "The passwords don't match."
           );
           dispatch(showAlert(mismatchPassAlert));
+          setError(true);
+          return;
         } else {
+          setError(false);
           patchFields["password"] = password;
         }
       }
@@ -192,6 +197,8 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
           <UsernameField value={username} onChange={setUsername}/>
           <PasswordField label="New Password" id={"password"} />
           <PasswordField label="Confirm Password" id={"passconfirm"} />
+          <PasswordField error={error} label="New Password" id={"password"} />
+          <PasswordField error={error} label="Confirm New Password" id={"passconfirm"} />
           <DepartmentSelect
             department={department}
             handleDepartmentChange={handleDepartmentChange}

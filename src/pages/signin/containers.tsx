@@ -56,7 +56,7 @@ const LoginContainer: React.FC = () => {
         <LoginHeader />
         <SignInForm noValidate onSubmit={onLoginSubmit}>
           <UsernameField />
-          <PasswordField label={"Password"} id={"password"} />
+          <PasswordField error={false} label={"Password"} id={"password"} />
           <ButtonContainer>
             <LoginButton text="Login" />
           </ButtonContainer>
