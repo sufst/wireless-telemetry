@@ -46,6 +46,8 @@ export const RegisterContainer: React.FC<{ registerUser: UserRegister }> = (
 
   const [error, setError] = useState<boolean>(false);
 
+  const [username, setUsername] = useState<string>("");
+
   const [department, setDepartment] = useState<UserDepartment>("Electronics");
 
   const [privilege, setPrivilege] = useState<UserPrivilege>("Basic");
@@ -62,7 +64,6 @@ export const RegisterContainer: React.FC<{ registerUser: UserRegister }> = (
     (event) => {
       event.preventDefault();
 
-      const username: string = event.target.username.value;
       const password: string = event.target.password.value;
       const confirmPass: string = event.target.passconfirm.value;
 
@@ -92,7 +93,7 @@ export const RegisterContainer: React.FC<{ registerUser: UserRegister }> = (
       );
       dispatch(showAlert(mismatchPassAlert));
     },
-    [department, privilege, dispatch, registerUser]
+    [username, department, privilege, dispatch, registerUser]
   );
 
   return (
@@ -101,7 +102,7 @@ export const RegisterContainer: React.FC<{ registerUser: UserRegister }> = (
       <RegisterPaper>
         <RegisterHeader />
         <RegistrationForm noValidate onSubmit={onRegisterSubmit}>
-          <UsernameField />
+          <UsernameField value={username} onChange={setUsername} />
           <PasswordField error={error} label="Password" id={"password"} />
           <PasswordField error={error} label="Confirm Password" id={"passconfirm"} />
           <DepartmentSelect

@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
 
@@ -37,16 +37,17 @@ const LoginContainer: React.FC = () => {
 
   const dispatch = useDispatch();
 
+  const [username, setUsername] = useState<string>("");
+
   const onLoginSubmit = useCallback(
     (event) => {
       event.preventDefault();
 
-      const username = event.target.username.value;
       const password = event.target.password.value;
 
       dispatch(loginUser({ username, password }));
     },
-    [dispatch]
+    [username, dispatch]
   );
 
   return (
@@ -55,7 +56,7 @@ const LoginContainer: React.FC = () => {
       <SignInPaper>
         <LoginHeader />
         <SignInForm noValidate onSubmit={onLoginSubmit}>
-          <UsernameField />
+          <UsernameField value={username} onChange={setUsername} />
           <PasswordField error={false} label={"Password"} id={"password"} />
           <ButtonContainer>
             <LoginButton text="Login" />

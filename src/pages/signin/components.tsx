@@ -57,29 +57,27 @@ export const LoginHeader: React.FC = () => {;
 
 //#region UsernameField Setup
 
-interface UsernameProps {
-  value?: string,
-  onChange?: any
-}
-
-const defaultUsernameProps: UsernameProps = {
-  value: "",
-  onChange: undefined,
-}
-
-export const UsernameField: React.FC<UsernameProps> = (props) => {
+export const UsernameField: React.FC<{
+  value:string,
+  onChange:React.Dispatch<React.SetStateAction<string>>
+}> = (props) => {
   return (
     <TextField
       variant="outlined"
       margin="normal"
-      {...(props.value && props.onChange && {
-        value:props.value,
-        onChange:
-          (event: React.ChangeEvent<HTMLInputElement>) => {
-          props.onChange(event.target.value);
-      }}
+      // {...(props.value && props.onChange && {
+      //   value:props.value,
+      //   onChange:
+      //     (event: React.ChangeEvent<HTMLInputElement>) => {
+      //     props.onChange(event.target.value);
+      // }}
 
-      )}
+      // )}
+
+      value={props.value}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            props.onChange(event.target.value);
+        }}
 
       required
       fullWidth
@@ -98,8 +96,6 @@ export const UsernameField: React.FC<UsernameProps> = (props) => {
     />
   );
 };
-
-UsernameField.defaultProps = defaultUsernameProps;
 
 //#endregion
 

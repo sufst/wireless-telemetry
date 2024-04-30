@@ -101,7 +101,6 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
     (event) => {
       event.preventDefault();
 
-      const username: string = event.target.username.value;
       const password: string = event.target.password.value;
       const confirmPass: string = event.target.passconfirm.value;
 
@@ -178,6 +177,7 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
       }
     },
     [department, privilege, dispatch]
+    [username, department, privilege, dispatch]
   );
 
   // TODO create a loading page to let user get loaded first
