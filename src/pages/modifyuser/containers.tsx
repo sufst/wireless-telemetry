@@ -36,7 +36,6 @@ import {
   SubmissionDialog,
 } from "./components";
 import { RegistrationForm, RegisterPaper } from "./styles";
-import { userPatch } from "modules/api/user";
 import { RootState } from "redux/store";
 import { usersPatch } from "modules/api/users";
 
@@ -80,14 +79,12 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
   }, []);
 
   const handleUserPatch = useCallback((fields: Fields) => {
-    console.log(fields, token, user)
-    if (token && user) {
+    if (token && user && Object.keys(fields).length > 0){
       usersPatch(user.username, token, fields);
     }
   }, [user, token]);
 
   useEffect(() => {
-    console.log(user)
     if (user) {
       setDepartment(user.department)
       setPrivilege(user.privilege)
@@ -169,14 +166,13 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
 
 
       // console.log(patchFields)
-
       if (token && user) {
         // usersPatch(user.username, token, patchFields);
         setUserFields(patchFields);
         setDialogOpened(true);
       }
+
     },
-    [department, privilege, dispatch]
     [username, department, privilege, dispatch]
   );
 
@@ -191,12 +187,10 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <RegisterPaper>
-        <RegisterHeader />
+        <RegisterHeader username={user.username} />
         {/* TODO Change form to be more scalable rather than stock html form */}
         <RegistrationForm noValidate onSubmit={onSubmit}>
           <UsernameField value={username} onChange={setUsername}/>
-          <PasswordField label="New Password" id={"password"} />
-          <PasswordField label="Confirm Password" id={"passconfirm"} />
           <PasswordField error={error} label="New Password" id={"password"} />
           <PasswordField error={error} label="Confirm New Password" id={"passconfirm"} />
           <DepartmentSelect
@@ -211,7 +205,7 @@ export const ModifyUserContainer: React.FC<{ user: SetUserAction | undefined }> 
             <LoginButton text="Submit" />
           </div>
         </RegistrationForm>
-        <SubmissionDialog patchFields={userFields} open={dialogOpened} handleDialogChange={handleDialogChange} handleUserPatch={handleUserPatch} />
+        <SubmissionDialog user={user} patchFields={userFields} open={dialogOpened} handleDialogChange={handleDialogChange} handleUserPatch={handleUserPatch} />
       </RegisterPaper>
       <RegisterFooter />
     </Container>

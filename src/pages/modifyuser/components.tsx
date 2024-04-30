@@ -30,8 +30,10 @@ import {
   DialogActions,
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { UserDepartment, UserPrivilege } from "types/models/user";
+import { UserDepartment, UserPrivilege, UserState } from "types/models/user";
 import { DepartmentLabel, Avatar } from "./styles";
+import { useHistory } from "react-router-dom";
+
 
 export const DepartmentSelect = (props: {
   department: UserDepartment;
@@ -102,7 +104,7 @@ export const PrivilegeSelect = (props: {
   );
 };
 
-export const RegisterHeader = () => {
+export const RegisterHeader = (props:{username:string}) => {
 
   return (
     <>
@@ -110,7 +112,7 @@ export const RegisterHeader = () => {
         <AccountCircleIcon />
       </Avatar>
       <Typography component="h1" variant="h5">
-        Please Enter the User Details
+        Change the {props.username}  Details
       </Typography>
     </>
   );
@@ -136,14 +138,17 @@ interface Fields {
 }
 
 export const SubmissionDialog = (props: {
+  user: UserState,
   patchFields: Fields,
   open: boolean,
   handleDialogChange: (event: boolean) => void,
   handleUserPatch: (fields: Fields) => void;
 }) => {
 
+  const history = useHistory();
+
   
-    const { patchFields, open, handleDialogChange, handleUserPatch } = props;
+    const { user, patchFields, open, handleDialogChange, handleUserPatch } = props;
 
   
     return(
@@ -152,22 +157,21 @@ export const SubmissionDialog = (props: {
         onClose={() => handleDialogChange(false)}
       >
         <DialogTitle>
-          Submission
+          Submit the following changes?
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are u sure u want to submit the following changes?
-          </DialogContentText>
             {Object.entries(patchFields).map(([key, value]) => (
               <DialogContentText key={key}>
-                {key}: {value}
+                {key}: {`${ key === "password" ? "" : user[key as keyof UserState] + " -> "}`}{value}
               </DialogContentText>
             ))}
             <DialogActions>
+            <Button onClick={() => handleDialogChange(false)}>No</Button>
             <Button onClick={() => {
               handleUserPatch(patchFields);
               handleDialogChange(false);
-            }}>Submit</Button>
+              history.push("/admin");
+            }}>Yes</Button>
             </DialogActions>
 
         </DialogContent>
