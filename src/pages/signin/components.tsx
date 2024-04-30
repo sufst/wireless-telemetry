@@ -87,6 +87,14 @@ export const UsernameField: React.FC<UsernameProps> = (props) => {
       label="Username"
       autoComplete="root"
       autoFocus
+      // https://mui.com/material-ui/react-text-field/#limitations
+      // "The input label "shrink" state isn't always correct.
+      // The input label is supposed to shrink as soon as the input is displaying something.
+      // In some circumstances, we can't determine the "shrink" state (number input, datetime input, Stripe input).
+      // You might notice an overlap."
+      //
+      //To fix this issue, we force the label to shrink by setting the shrink prop to true.
+      InputLabelProps={{shrink:true}}
     />
   );
 };
