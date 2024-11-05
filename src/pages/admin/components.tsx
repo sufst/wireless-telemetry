@@ -17,133 +17,165 @@
 */
 import React from "react";
 import { UserState } from "types/models/user";
-import { getColorForPrivelege, TableHeaderCell, Avatar, Username } from "./styles";
+import {
+	getColorForPrivelege,
+	TableHeaderCell,
+	Avatar,
+	Username,
+} from "./styles";
 import { v4 } from "uuid";
 
+import { useCallback } from "react";
+
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Grid,
-  Typography,
-  Button,
-  Stack,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Paper,
+	Grid,
+	Typography,
+	Button,
+	Stack,
 } from "@mui/material";
 
-import DeleteIcon from '@mui/icons-material/Delete';
+import { usersDelete } from "modules/api/users";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useHistory } from "react-router-dom";
+import { Token } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { RootState } from "redux/store";
 
 export const AdminPanelTable: React.FC<{ users: UserState[] }> = ({
-  users,
+	users,
 }) => {
-
-  return (
-    <TableContainer
-      component={Paper}
-      sx={{
-        borderRadius: 5,
-        maxWidth: "90%",
-        background: "#292929",
-      }}
-    >
-      <Table sx={{minWidth: 650}} aria-label="simple table">
-        <AdminPanelTableHead />
-        <TableBody>
-          {users.map((user) => (
-            <AdminPanelTableRow user={user} key={v4()} />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
+	return (
+		<TableContainer
+			component={Paper}
+			sx={{
+				borderRadius: 5,
+				maxWidth: "90%",
+				background: "#292929",
+			}}
+		>
+			<Table sx={{ minWidth: 650 }} aria-label="simple table">
+				<AdminPanelTableHead />
+				<TableBody>
+					{users.map((user) => (
+						<AdminPanelTableRow user={user} key={v4()} />
+					))}
+				</TableBody>
+			</Table>
+		</TableContainer>
+	);
 };
 
 // TODO: Solve the warning about user.creation being optional, even though its requied as part of the calculation, potentially breaking the application
 const AdminPanelTableRow: React.FC<{ user: UserState }> = ({ user }) => {
+	const history = useHistory();
 
-  const history = useHistory();
+	// TODO: Remove force unwrapping here. Make it safer.
+	const createdAt = new Date(user.creation! * 1000).toLocaleString("en-GB", {
+		day: "numeric",
+		month: "numeric",
+		year: "numeric",
+	});
 
-  // TODO: Remove force unwrapping here. Make it safer.
-  const createdAt = new Date(user.creation! * 1000).toLocaleString("en-GB", {
-    day: "numeric",
-    month: "numeric",
-    year: "numeric",
-  });
+	const selectUser = (state: RootState) => state.user;
+	const currentUser = useSelector(selectUser);
 
-  return (
-    <TableRow>
-      <TableCell>
-        <Grid container>
-          <Grid item lg={2}>
-            <Avatar alt={user.username} src="." />
-          </Grid>
-          <Grid item lg={10}>
-            <Username>{user.username}</Username>
-          </Grid>
-        </Grid>
-      </TableCell>
+	const token = currentUser.accessToken;
 
-      <TableCell>
-        <Typography
-          sx={{color: "lightGray"}}
-          color="primary"
-          variant="subtitle2"
-        >
-          {user.department}
-        </Typography>
-      </TableCell>
+	const handleUserDelete = useCallback(
+		(user: UserState) => {
+			if (token && user && user.username) {
+				usersDelete(user.username, token);
+			}
+		},
+		[token]
+	);
 
-      <TableCell>
-        <div
-          style={{
-            color: getColorForPrivelege(user.privilege!),
-            fontWeight: "bold",
-          }}
-        >
-          {user.privilege}
-        </div>
-      </TableCell>
+	return (
+		<TableRow>
+			<TableCell>
+				<Grid container>
+					<Grid item lg={2}>
+						<Avatar alt={user.username} src="." />
+					</Grid>
+					<Grid item lg={10}>
+						<Username>{user.username}</Username>
+					</Grid>
+				</Grid>
+			</TableCell>
 
-      <TableCell>
-        <div style={{color: "lightGray"}}>
-          {createdAt}
-        </div>
-      </TableCell>
-      <TableCell>
-        <Stack spacing={3} direction="row">
-          <Button onClick={()=>history.push({
-            pathname:"/modify",
-            search: `?username=${user.username}`,
-            state: {  // location state
-              username: user.username, 
-            },
-          })} variant="contained">
-            Edit
-          </Button>
-          <Button color="error" variant="contained" >
-            <DeleteIcon/>
-          </Button>
-        </Stack>
-      </TableCell>
-    </TableRow>
-  );
+			<TableCell>
+				<Typography
+					sx={{ color: "lightGray" }}
+					color="primary"
+					variant="subtitle2"
+				>
+					{user.department}
+				</Typography>
+			</TableCell>
+
+			<TableCell>
+				<div
+					style={{
+						color: getColorForPrivelege(user.privilege!),
+						fontWeight: "bold",
+					}}
+				>
+					{user.privilege}
+				</div>
+			</TableCell>
+
+			<TableCell>
+				<div style={{ color: "lightGray" }}>{createdAt}</div>
+			</TableCell>
+			<TableCell>
+				<Stack spacing={3} direction="row">
+					<Button
+						onClick={() =>
+							history.push({
+								pathname: "/modify",
+								search: `?username=${user.username}`,
+								state: {
+									// location state
+									username: user.username,
+								},
+							})
+						}
+						variant="contained"
+					>
+						Edit
+					</Button>
+					<Button
+						onClick={() => handleUserDelete(user)}
+						color="error"
+						variant="contained"
+					>
+						<DeleteIcon />
+					</Button>
+				</Stack>
+			</TableCell>
+		</TableRow>
+	);
 };
 
 const AdminPanelTableHead: React.FC = () => {
-
-  return (
-    <TableHead>
-      <TableRow>
-        <TableHeaderCell>Username</TableHeaderCell>
-        <TableHeaderCell>Department</TableHeaderCell>
-        <TableHeaderCell>Privilege</TableHeaderCell>
-        <TableHeaderCell>Created At</TableHeaderCell>
-        <TableHeaderCell sx={{width:"15%"}} >Modification</TableHeaderCell>
-      </TableRow>
-    </TableHead>
-  );
+	return (
+		<TableHead>
+			<TableRow>
+				<TableHeaderCell>Username</TableHeaderCell>
+				<TableHeaderCell>Department</TableHeaderCell>
+				<TableHeaderCell>Privilege</TableHeaderCell>
+				<TableHeaderCell>Created At</TableHeaderCell>
+				<TableHeaderCell sx={{ width: "15%" }}>
+					Modification
+				</TableHeaderCell>
+			</TableRow>
+		</TableHead>
+	);
 };
